@@ -14,6 +14,8 @@ camlp5_version=8.03.06
 ocaml_version=5.3.0
 rocq_version=9.0.0
 
+one_stage="false"
+
 usage() {
     cat <<__EOF__
 usage: `basename $0` \$library [\$stage]
@@ -98,7 +100,8 @@ esac
 base=`basename $hollight_file .ml`
 lpfile=$library/mappings.lp
 root_path=HOLLight.$library
-jobs='-j32'
+: "${NB_CORES:=$(nproc)}"
+jobs="-j$NB_CORES"
 
 # we prefix $lpfile, $vfiles and $mkfile with "../../"
 lpfile=../../$lpfile
@@ -111,7 +114,18 @@ cd tmp
 
 if test -n "$2"
 then
-    stage=$2
+    if test "$2" = "--only"
+    then
+        if test -n "$3"
+        then
+            stage=$3
+            one_stage="true"
+        else
+            error "number of stage expected!"
+        fi
+    else
+        stage=$2
+    fi
 else
     if test -f STAGE
     then
@@ -221,18 +235,18 @@ config_output_dir() {
 translate_proofs() {
     start translate HOL-Light proofs to lambdapi and rocq
     cd output
-    make split
-    make $jobs lp
-    make $jobs v
-    make $jobs merge-spec-files
-    make $jobs rm-empty-deps
+    /bin/bash -c time make split
+    /bin/bash -c time make $jobs lp
+    /bin/bash -c time make $jobs v
+    /bin/bash -c time make $jobs merge-spec-files
+    /bin/bash -c time make $jobs rm-empty-deps
     cd ..
 }
 
 check_proofs() {
     start check proofs
     cd output
-    make $jobs vo
+    /bin/bash -c time make $jobs vo
     cd ..
 }
 
@@ -278,8 +292,13 @@ stage() {
     then
         shift
         $*
-        echo $stage > STAGE
-        stage=`expr $stage + 1`
+        if test $one_stage = "true"
+        then
+            echo 20 > STAGE
+        else
+            echo $stage > STAGE
+            stage=`expr $stage + 1`
+        fi
     fi
 }
 
