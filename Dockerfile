@@ -9,14 +9,14 @@ COPY --chown=opam:opam . /home/opam/rocq-hollight
 # RUN export HOL2DK_DIR=`pwd`/hol2dk
 
 WORKDIR $HOME/rocq-hollight
-RUN ./reproduce Multivariate --only 2
-RUN ./reproduce Multivariate --only 3
-RUN ./reproduce Multivariate --only 4
-RUN ./reproduce Multivariate --only 5
-RUN ./reproduce Multivariate --only 6
-RUN ./reproduce Multivariate --only 7
-RUN ./reproduce Multivariate --only 8
-RUN ./reproduce Multivariate --only 9
+# Actually, it does not matter wether to reproduce stages 1 to 8 for HOL or another library
+RUN ./reproduce HOL --only 2
+RUN ./reproduce HOL --only 3
+RUN ./reproduce HOL --only 4
+RUN ./reproduce HOL --only 5
+RUN ./reproduce HOL --only 6
+RUN ./reproduce HOL --only 7
+RUN ./reproduce HOL --only 8
 
 ENTRYPOINT ["./reproduce"]
-CMD ["-y", "10"]
+CMD ["HOL", "9"]
