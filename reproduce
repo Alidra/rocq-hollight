@@ -235,18 +235,18 @@ config_output_dir() {
 translate_proofs() {
     start translate HOL-Light proofs to lambdapi and rocq
     cd output
-    /bin/bash -c 'time make split'
-    /bin/bash -c 'time make $jobs lp'
-    /bin/bash -c 'time make $jobs v'
-    /bin/bash -c 'time make $jobs merge-spec-files'
-    /bin/bash -c 'time make $jobs rm-empty-deps'
+    /bin/bash -c "time make split"
+    /bin/bash -c "time make $jobs lp"
+    /bin/bash -c "time make $jobs v"
+    /bin/bash -c "time make $jobs merge-spec-files"
+    /bin/bash -c "time make $jobs rm-empty-deps"
     cd ..
 }
 
 check_proofs() {
     start check proofs
     cd output
-    /bin/bash -c 'time make $jobs vo'
+    /bin/bash -c "time make $jobs vo"
     cd ..
 }
 
