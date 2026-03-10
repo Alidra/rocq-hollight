@@ -1,9 +1,9 @@
-Bootstrap: docker
-From: abdelghanialidra/rocq-hol-light:0.0.1
+Bootstrap: docker-daemon
+From: abdelghanialidra/rocq-hol-light:0.0.2
 
 %help
     to build a .sif image from this file use
-    sudo singularity build rocq-hol-light_0.0.1.sif rocq-coq-hollight.singularity
+    sudo singularity build rocq-hol-light_0.0.2.sif rocq-coq-hollight.singularity
     
 %environment
     HOME=/home/opam

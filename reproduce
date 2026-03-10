@@ -246,7 +246,9 @@ translate_proofs() {
 check_proofs() {
     start check proofs
     cd output
-    /bin/bash -c "time make $jobs vo"
+    # Rocq shows a lot of warnings that I want to seperate from the perfs shown by time 
+    # Actual errors will be duplicated in stdout and stderr
+    /bin/bash -c "time make $jobs vo" 2> >(awk '{print; if ($0 ~ /error/) print > "/dev/stderr"}')
     cd ..
 }
 
