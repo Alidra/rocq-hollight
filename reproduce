@@ -188,6 +188,7 @@ install_deps() {
 install_hol2dk() {
     checkout_commit https://github.com/Deducteam/hol2dk.git $hol2dk_commit
     cd hol2dk
+    git cherry-pick 817502aba1b87a5403231b156064ddd0e38caac4
     dune build && dune install
     cd ..
 }
@@ -248,7 +249,7 @@ check_proofs() {
     cd output
     # Rocq shows a lot of warnings that I want to seperate from the perfs shown by time 
     # Actual errors will be duplicated in stdout and stderr
-    /bin/bash -c "time make $jobs vo" 2> >(awk '{print; if ($0 ~ /error/) print > "/dev/stderr"}')
+    /bin/bash -c "BASE_ROCQ_OPTIONS='-w none' time make $jobs vo" 2> >(awk '{print; if ($0 ~ /error/) print > "/dev/stderr"}')
     cd ..
 }
 
