@@ -1,0 +1,12 @@
+FROM abdelghanialidra/rocq-hol-light:0.0.2
+LABEL authors=Deducteam
+
+RUN sudo apt update
+RUN sudo apt install time
+
+COPY --chown=opam:opam . /home/opam/rocq-hollight
+RUN opam remove hol2dk
+RUN ./reproduce HOL --only 6
+
+ENTRYPOINT ["./reproduce"]
+CMD ["HOL", "9"]

@@ -188,7 +188,10 @@ install_deps() {
 install_hol2dk() {
     checkout_commit https://github.com/Deducteam/hol2dk.git $hol2dk_commit
     cd hol2dk
+    # cherry-pick to use extra Rocq options
     git cherry-pick 817502aba1b87a5403231b156064ddd0e38caac4
+    # batch Makefile to print memory footprint of Rocq processes
+    sed -i 's|@rocq compile $(ROCQ_OPTIONS) $<|@/bin/bash -c "/usr/bin/time -f %C_%U_%M rocq compile $(ROCQ_OPTIONS) $<"|' Makefile
     dune build && dune install
     cd ..
 }
@@ -236,11 +239,11 @@ config_output_dir() {
 translate_proofs() {
     start translate HOL-Light proofs to lambdapi and rocq
     cd output
-    /bin/bash -c "time make split"
-    /bin/bash -c "time make $jobs lp"
-    /bin/bash -c "time make $jobs v"
-    /bin/bash -c "time make $jobs merge-spec-files"
-    /bin/bash -c "time make $jobs rm-empty-deps"
+    /bin/bash -c "time -p make split"
+    /bin/bash -c "time -p make $jobs lp"
+    /bin/bash -c "time -p make $jobs v"
+    /bin/bash -c "time -p make $jobs merge-spec-files"
+    /bin/bash -c "time -p make $jobs rm-empty-deps"
     cd ..
 }
 
@@ -249,7 +252,7 @@ check_proofs() {
     cd output
     # Rocq shows a lot of warnings that I want to seperate from the perfs shown by time 
     # Actual errors will be duplicated in stdout and stderr
-    /bin/bash -c "BASE_ROCQ_OPTIONS='-w none' time make $jobs vo" 2> >(awk '{print; if ($0 ~ /error/) print > "/dev/stderr"}')
+    /bin/bash -c "EXTRA_ROCQ_OPTIONS='-w none' time make -p $jobs vo" 2> >(awk '{print; if ($0 ~ /error/) print > "/dev/stderr"}')
     cd ..
 }
 
@@ -311,7 +314,7 @@ stage 2 install_hollight_deps
 stage 3 install lambdapi $lambdapi_commit
 stage 4 install rocq-prover $rocq_version
 stage 5 install_deps
-stage 6 install hol2dk $hol2dk_commit
+stage 6 install_hol2dk $hol2dk_commit
 #export HOL2DK_DIR=`pwd`/hol2dk
 export HOL2DK_DIR=$OPAM_SWITCH_PREFIX/share/hol2dk
 stage 7 install_hollight
