@@ -239,11 +239,11 @@ config_output_dir() {
 translate_proofs() {
     start translate HOL-Light proofs to lambdapi and rocq
     cd output
-    /bin/bash -c "time -p make split"
-    /bin/bash -c "time -p make $jobs lp"
-    /bin/bash -c "time -p make $jobs v"
-    /bin/bash -c "time -p make $jobs merge-spec-files"
-    /bin/bash -c "time -p make $jobs rm-empty-deps"
+    time make split
+    time make $jobs lp
+    time make $jobs v
+    time make $jobs merge-spec-files
+    time make $jobs rm-empty-deps
     cd ..
 }
 
@@ -252,7 +252,8 @@ check_proofs() {
     cd output
     # Rocq shows a lot of warnings that I want to seperate from the perfs shown by time 
     # Actual errors will be duplicated in stdout and stderr
-    /bin/bash -c "EXTRA_ROCQ_OPTIONS='-w none' time make -p $jobs vo" 2> >(awk '{print; if ($0 ~ /error/) print > "/dev/stderr"}')
+    export EXTRA_ROCQ_OPTIONS='-w none' 
+    time make $jobs vo 2> >(awk '{print; if ($0 ~ /error/) print > "/dev/stderr"}')
     cd ..
 }
 
