@@ -6,6 +6,8 @@ RUN sudo apt install time
 
 COPY --chown=opam:opam . /home/opam/rocq-hollight
 RUN opam remove hol2dk
+RUN opam remove lambdapi
+RUN ./reproduce HOL --only 3
 RUN ./reproduce HOL --only 6
 
 ENTRYPOINT ["./reproduce"]

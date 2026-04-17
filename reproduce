@@ -8,8 +8,8 @@ set -e # to exit as soon as there is an error
 
 hollight_version=3.1.0
 hollight_commit=Release-3.1.0
-hol2dk_commit=2.1.0
-lambdapi_commit=3.0.0
+hol2dk_commit=to-classes
+lambdapi_commit=master
 camlp5_version=8.03.06
 ocaml_version=5.3.0
 rocq_version=9.0.0
@@ -174,7 +174,7 @@ install_hollight_deps() {
 install_lambdapi() {
     checkout_commit https://github.com/Deducteam/lambdapi.git $lambdapi_commit
     cd lambdapi
-    git checkout -b reproduce
+    # git checkout -b reproduce
     opam install -y .
     cd ..
 }
@@ -186,10 +186,10 @@ install_deps() {
 }
 
 install_hol2dk() {
-    checkout_commit https://github.com/Deducteam/hol2dk.git $hol2dk_commit
+    checkout_commit https://github.com/agontard/hol2dk.git $hol2dk_commit
     cd hol2dk
     # cherry-pick to use extra Rocq options
-    git cherry-pick 817502aba1b87a5403231b156064ddd0e38caac4
+    # git cherry-pick 817502aba1b87a5403231b156064ddd0e38caac4
     # batch Makefile to print memory footprint of Rocq processes
     sed -i 's|@rocq compile $(ROCQ_OPTIONS) $<|@/bin/bash -c "/usr/bin/time -f %C_%U_%M rocq compile $(ROCQ_OPTIONS) $<"|' Makefile
     dune build && dune install
@@ -232,7 +232,7 @@ config_output_dir() {
     mkdir -p output
     cd output
     if test -f Makefile; then make $jobs clean-all; fi
-    hol2dk config $hollight_file $root_path $require $vfiles $mkfile $lpfile
+    hol2dk config-with classes $hollight_file $library $HOL2DK_DIR/HOL_Light.lp $HOL2DK_DIR/HOL_Light.v
     cd ..
 }
 
@@ -312,7 +312,7 @@ stage() {
 stage 1 create_opam_switch
 eval `opam env`
 stage 2 install_hollight_deps
-stage 3 install lambdapi $lambdapi_commit
+stage 3 install_lambdapi $lambdapi_commit
 stage 4 install rocq-prover $rocq_version
 stage 5 install_deps
 stage 6 install_hol2dk $hol2dk_commit
